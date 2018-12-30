@@ -46,6 +46,9 @@ optimizer = tf.train.GradientDescentOptimizer(0.005).minimize(loss)
 values = tf.equal(tf.argmax(prediction, 1),tf.argmax(labels ,1))
 accuracy = tf.reduce_mean(tf.cast(values, tf.float32))
 
+# Add ops to save and restore all the variables.
+saver = tf.train.Saver()
+
 #Training the data
 session = tf.Session()
 session.run(tf.global_variables_initializer())
@@ -68,3 +71,17 @@ for i in range(iterations):
 # Testing the accuracy of the trained neural network
 a = session.run(accuracy, feed_dict={features: test_x, labels: test_y})
 print("Test accuracy: " + str(a))
+
+# Predictions of the type of flower as output
+predict_dataset = [
+    [5.0, 3.3, 1.4, 0.2,], # Setosa: 0
+    [6.0, 3.0, 4.8, 1.8,], # Virginica: 2
+    [6.9, 3.1, 4.9, 1.5]   # Versicolor: 1
+]
+
+classification = session.run(tf.argmax(prediction, 1), feed_dict={features: predict_dataset})
+print(classification)
+
+# Save the variables to disk.
+save_path = saver.save(session, "/tmp/model.ckpt")
+print("Model saved in path: %s" % save_path)
